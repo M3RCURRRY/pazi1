@@ -2,10 +2,10 @@
 #include <stdlib.h>
 
 void init_point(struct Point* P, BIGNUM* X, BIGNUM* Y, BIGNUM* T, BIGNUM* Z) {
-    BN_bn2dec(P->x, X);
-    BN_bn2dec(P->y, Y);
-    BN_bn2dec(P->t, T);
-    BN_bn2dec(P->z, Z);
+    BN_copy(P->x, X);
+    BN_copy(P->y, Y);
+    BN_copy(P->t, T);
+    BN_copy(P->z, Z);
 }
 
 void init_curve(struct Curve* C) {
