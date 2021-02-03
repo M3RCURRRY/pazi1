@@ -51,7 +51,6 @@ struct Point add_points(struct Point p_1, struct Point p_2){
     BN_mod_mul(help, help, p_2.x, C.p, ctx);
     BN_mod_mul(help, help, p_2.z, C.p, ctx);
     BN_mod_add(new_p.x, new_p.x, help, C.p, ctx);
-    //BN_mod(new_p.x, new_p.x, C.p, ctx);
 
     //y3 = y1*z1*y2*z2 - x1*t1*x2*t2
     BN_dec2bn(&help, "0");
@@ -62,7 +61,6 @@ struct Point add_points(struct Point p_1, struct Point p_2){
     BN_mod_mul(help, help, p_2.x, C.p, ctx);
     BN_mod_mul(help, help, p_2.t, C.p, ctx);
     BN_mod_sub(new_p.y, new_p.y, help, C.p, ctx);
-    //BN_mod(new_p.y, new_p.y, C.p, ctx);
 
     //t3 = t1*z1*t2*z2 - b*x1*y1*x2*y2
     BN_dec2bn(&help, "0");
@@ -74,7 +72,6 @@ struct Point add_points(struct Point p_1, struct Point p_2){
     BN_mod_mul(help, help, p_2.x, C.p, ctx);
     BN_mod_mul(help, help, p_2.y, C.p, ctx);
     BN_mod_sub(new_p.t, new_p.t, help, C.p, ctx);
-    //BN_mod(new_p.t, new_p.t, C.p, ctx);
 
     //z3 = z1^2*y2^2 + x2^2*t1^2
     BN_dec2bn(&help, "0");
@@ -85,7 +82,6 @@ struct Point add_points(struct Point p_1, struct Point p_2){
     BN_mod_mul(help, help, p_1.t, C.p, ctx);
     BN_mod_mul(help, help, p_1.t, C.p, ctx);
     BN_mod_add(new_p.z, new_p.z, help, C.p, ctx);
-    //BN_mod(new_p.z, new_p.z, C.p, ctx);
     BN_CTX_free(ctx);
 
     BN_free(help);
@@ -155,8 +151,6 @@ struct Point multiple_point(struct Point P, BIGNUM * k){
     BIGNUM * help = BN_new();
     BIGNUM * zero = BN_new();
 
-    //printf("\n>> MulP : k = %s\n", BN_bn2dec(k));
-
     C.b = BN_new();
     C.p = BN_new();
     C.q = BN_new();
@@ -202,31 +196,23 @@ int if_contains(struct Point P){
     init_curve(&C);
 
     BN_CTX *ctx = BN_CTX_new();
-    //printf("Before calc :\n> left1 = %s\nleft2 = %s\nright = %s\n", BN_bn2dec(left1), BN_bn2dec(left2), BN_bn2dec(right));
     //left1
     BN_mul(left1, P.x, P.x, ctx);
     BN_copy(left2, left1);
     BN_mul(help, P.y, P.y, ctx);
     BN_add(left1, left1, help);
     BN_mod(left1, left1, C.p, ctx);
-    //printf("LEFT1 CHANGED :\n> left1 = %s\nleft2 = %s\nright = %s\n", BN_bn2dec(left1), BN_bn2dec(left2), BN_bn2dec(right));
 
     //left2
     BN_mul(left2, left2, C.b, ctx);
     BN_mul(help, P.t, P.t, ctx);
     BN_add(left2, left2, help);
     BN_mod(left2, left2, C.p, ctx);
-    //printf("LEFT2 CHANGED :\n> left1 = %s\nleft2 = %s\nright = %s\n", BN_bn2dec(left1), BN_bn2dec(left2), BN_bn2dec(right));
 
     //right
     BN_mul(right, P.z, P.z,ctx);
     BN_mod(right, right, C.p, ctx);
     BN_CTX_free(ctx);
-    //printf("RIGHT CHANGED :\n> left1 = %s\nleft2 = %s\nright = %s\n", BN_bn2dec(left1), BN_bn2dec(left2), BN_bn2dec(right));
-
-    //printf(">> if_con : \n> left1 = %s\n> left2 = %s\n> right = %s\n", BN_bn2dec(left1), BN_bn2dec(left2), BN_bn2dec(right));
-    //printf(">> if_con : \n> CMP left1 & right = %d\n", BN_cmp(left1, right));
-    //printf(">> if_con : \n> CMP left2 & right = %d\n", BN_cmp(left2, right));
 
     if(BN_cmp(left1, right) == 0 && BN_cmp(left2, right) == 0) {
         BN_free(left1);
