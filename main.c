@@ -30,20 +30,7 @@ int main()
     BN_dec2bn(&z1, t_s);
     BN_dec2bn(&t1, z_s);
     init_point(&P, x1, y1, t1, z1);
-    /*
-    printf("\nPoint P:\n%s\n%s\n%s\n%s\n\n",BN_bn2dec(P.z),BN_bn2dec(P.y),BN_bn2dec(P.x),BN_bn2dec(P.t));
-    printf("\nPoint QQ:\n%s\n%s\n%s\n%s\n\n",BN_bn2dec(QQ.z),BN_bn2dec(QQ.y),BN_bn2dec(QQ.x),BN_bn2dec(QQ.t));
 
-    QQ = add_points(P,QQ);
-
-    printf("\nPoint P:\n%s\n%s\n%s\n%s\n\n",BN_bn2dec(QQ.z),BN_bn2dec(QQ.y),BN_bn2dec(QQ.x),BN_bn2dec(QQ.t));
-
-    if(if_contains(P))
-        printf("\nCONTAINS\n");
-    else
-        printf("\nNOT CONTAINS\n");
-    */
-    
     //Tест 1
     BIGNUM * k;
     BIGNUM * n;
@@ -72,9 +59,10 @@ int main()
     Test_2.t = BN_new();
     Test_2.z = BN_new();
     Test_2 = multiple_point(P, C.q);
-    
+
     printf("2 тест. Равны ли нейтральная точка и [q]P: ");
     if (BN_cmp(N.x, Test_2.x) && BN_cmp(N.y, Test_2.y) && BN_cmp(N.t, Test_2.t) && BN_cmp(N.z, Test_2.z))
+    //if (N.x == Test_2.x && N.y == Test_2.y && N.t == Test_2.t && N.z == Test_2.z)
         printf("да\n");
     else
         printf("нет\n");
