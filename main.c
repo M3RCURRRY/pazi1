@@ -43,6 +43,7 @@ int main()
     else
         printf("\nNOT CONTAINS\n");
     */
+    
     //Tест 1
     BIGNUM * k;
     BIGNUM * n;
@@ -51,10 +52,7 @@ int main()
     BN_dec2bn(&n, "100000000000000000000000000");
     BN_rand_range(k,n);
     printf("1 тест. Является ли точка [k]P частью кривой: ");
-    //--------
-    //BIGNUM * tmp = BN_new();
-    //BN_dec2bn(&tmp, "1338359");
-    //--------
+
     if (if_contains(multiple_point(P, k)) == 1) {
         printf("да\n");
     }
@@ -74,14 +72,9 @@ int main()
     Test_2.t = BN_new();
     Test_2.z = BN_new();
     Test_2 = multiple_point(P, C.q);
-
-    printf("\nPoint T:\nX = %s\nY = %s\nT = %s\nZ = %s\n",BN_bn2dec(Test_2.x), BN_bn2dec(Test_2.y), BN_bn2dec(Test_2.t), BN_bn2dec(Test_2.z));
-    printf("\nPoint P:\nX = %s\nY = %s\nT = %s\nZ = %s\n",BN_bn2dec(P.x), BN_bn2dec(P.y), BN_bn2dec(P.t), BN_bn2dec(P.z));
-    printf("\nPoint N:\nX = %s\nY = %s\nT = %s\nZ = %s\n\n",BN_bn2dec(N.x), BN_bn2dec(N.y), BN_bn2dec(N.t), BN_bn2dec(N.z));
-
+    
     printf("2 тест. Равны ли нейтральная точка и [q]P: ");
-    if (BN_cmp(N.x, Test_2.x) == 0 && BN_cmp(N.y, Test_2.y) == 0 && BN_cmp(N.t, Test_2.t) == 0 && BN_cmp(N.z, Test_2.z) == 0)
-    //if (N.x == Test_2.x && N.y == Test_2.y && N.t == Test_2.t && N.z == Test_2.z)
+    if (BN_cmp(N.x, Test_2.x) && BN_cmp(N.y, Test_2.y) && BN_cmp(N.t, Test_2.t) && BN_cmp(N.z, Test_2.z))
         printf("да\n");
     else
         printf("нет\n");
