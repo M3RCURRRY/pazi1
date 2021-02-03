@@ -10,6 +10,16 @@ int main()
 
     struct Curve C;
     struct Point P;
+
+    P.x = BN_new();
+    P.y = BN_new();
+    P.t = BN_new();
+    P.z = BN_new();
+
+    C.q = BN_new();
+    C.p = BN_new();
+    C.b = BN_new();
+
     init_curve(&C);
 
     /*
@@ -21,10 +31,10 @@ int main()
     init_point(&QQ, zro, one, one, one);
     */
 
-    BIGNUM * x1;
-    BIGNUM * y1;
-    BIGNUM * t1;
-    BIGNUM * z1;
+    BIGNUM * x1 = BN_new();
+    BIGNUM * y1 = BN_new();
+    BIGNUM * t1 = BN_new();
+    BIGNUM * z1 = BN_new();
     BN_dec2bn(&x1, x_s);
     BN_dec2bn(&y1, y_s);
     BN_dec2bn(&z1, t_s);
@@ -32,28 +42,31 @@ int main()
     init_point(&P, x1, y1, t1, z1);
 
     //Tест 1
-    BIGNUM * k;
-    BIGNUM * n;
-    k = BN_new();
-    n = BN_new();
+    BIGNUM * k = BN_new();
+    BIGNUM * n = BN_new();
     BN_dec2bn(&n, "100000000000000000000000000");
     BN_rand_range(k,n);
     printf("1 тест. Является ли точка [k]P частью кривой: ");
-
     if (if_contains(multiple_point(P, k)) == 1) {
         printf("да\n");
     }
     else
         printf("нет\n");
 
-
     //Tест 2
     struct Point N;
+
+    N.x = BN_new();
+    N.y = BN_new();
+    N.t = BN_new();
+    N.z = BN_new();
+
     BN_dec2bn(&x1, "1");
     BN_dec2bn(&y1, "0");
     init_point(&N, y1, x1, x1, x1);
 
     struct Point Test_2;
+
     Test_2.x = BN_new();
     Test_2.y = BN_new();
     Test_2.t = BN_new();
@@ -62,18 +75,24 @@ int main()
 
     printf("2 тест. Равны ли нейтральная точка и [q]P: ");
     if (BN_cmp(N.x, Test_2.x) && BN_cmp(N.y, Test_2.y) && BN_cmp(N.t, Test_2.t) && BN_cmp(N.z, Test_2.z))
-    //if (N.x == Test_2.x && N.y == Test_2.y && N.t == Test_2.t && N.z == Test_2.z)
+        //if (N.x == Test_2.x && N.y == Test_2.y && N.t == Test_2.t && N.z == Test_2.z)
         printf("да\n");
     else
         printf("нет\n");
 
     //Tест 3
     printf("3.1 тест. Верно ли, что [q+1]P = P: ");
-    BIGNUM * qq;
-    qq = BN_new();
+    BIGNUM * qq = BN_new();
     BN_dec2bn(&qq, "1");
     BN_add(qq, qq, C.q);
-    struct Point Test_3 = multiple_point(P, qq);
+    struct Point Test_3;
+
+    Test_3.x = BN_new();
+    Test_3.y = BN_new();
+    Test_3.t = BN_new();
+    Test_3.z = BN_new();
+
+    Test_3 = multiple_point(P, qq);
     if (BN_cmp(P.x,Test_3.x) && BN_cmp(P.y, Test_3.y) && BN_cmp(P.t, Test_3.t) && BN_cmp(P.z, Test_3.z))
         printf("да\n");
     else
@@ -92,13 +111,22 @@ int main()
         printf("нет\n");
 
     //Tест 4
-    BIGNUM * k1;
-    BIGNUM * k2;
-    k1 = BN_new();
-    k2 = BN_new();
+    BIGNUM * k1 = BN_new();
+    BIGNUM * k2 = BN_new();
     BN_rand_range(k1, n);
     BN_rand_range(k2, n);
     struct Point Right, Left;
+
+    Right.x = BN_new();
+    Right.y = BN_new();
+    Right.t = BN_new();
+    Right.z = BN_new();
+
+    Left.x = BN_new();
+    Left.y = BN_new();
+    Left.t = BN_new();
+    Left.z = BN_new();
+
     Right = multiple_point(P, k2);
     Left = multiple_point(P, k1);
     Left = add_points(Left, Right);
