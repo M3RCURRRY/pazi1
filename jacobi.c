@@ -5,11 +5,7 @@ const char * p_s = "115792089237316195423570985008687907853269984665640564039457
 const char * q_s = "4824670384888174809315457708695329493868526062531865828358260708486391273721";
 const char * b_s = "115792089237316195423570985008687907853269984665640564039457584007913111864737";
 
-void init_point(struct Point * P, BIGNUM * X, BIGNUM * Y, BIGNUM * T, BIGNUM * Z){
-    P->x = BN_new();
-    P->y = BN_new();
-    P->t = BN_new();
-    P->z = BN_new();
+void init_point(struct Point * P, BIGNUM * X, BIGNUM * Y, BIGNUM * T, BIGNUM * Z) {
     BN_copy(P->x, X);
     BN_copy(P->y, Y);
     BN_copy(P->t, T);
@@ -17,9 +13,6 @@ void init_point(struct Point * P, BIGNUM * X, BIGNUM * Y, BIGNUM * T, BIGNUM * Z
 }
 
 void init_curve(struct Curve * C){
-    C->q = BN_new();
-    C->p = BN_new();
-    C->b = BN_new();
     BN_dec2bn(&C->p, p_s);
     BN_dec2bn(&C->q, q_s);
     BN_dec2bn(&C->b, b_s);
@@ -90,14 +83,21 @@ struct Point add_points(struct Point p_1, struct Point p_2){
 }
 
 struct Point double_point(struct Point P){
-    BIGNUM * yz;
-    BIGNUM * tz;
-    BIGNUM * yt;
-    yz = BN_new();
-    tz = BN_new();
-    yt = BN_new();
+    BIGNUM * yz = BN_new();
+    BIGNUM * tz = BN_new();
+    BIGNUM * yt = BN_new();
     struct Point new_p;
     struct Curve C;
+
+    C.q = BN_new();
+    C.p = BN_new();
+    C.b = BN_new();
+
+    new_p.t = BN_new();
+    new_p.x = BN_new();
+    new_p.y = BN_new();
+    new_p.z = BN_new();
+
     init_curve(&C);
     init_point(&new_p, yz, yz, yz, yz);
 
@@ -155,7 +155,18 @@ struct Point multiple_point(struct Point P, BIGNUM * k){
     C.p = BN_new();
     C.q = BN_new();
 
+    Q.x = BN_new();
+    Q.y = BN_new();
+    Q.t = BN_new();
+    Q.z = BN_new();
+
+    R.x = BN_new();
+    R.y = BN_new();
+    R.t = BN_new();
+    R.z = BN_new();
+
     init_curve(&C);
+
     BN_dec2bn(&help, "1");
     BN_dec2bn(&zero, "0");
     init_point(&Q, zero, help, help, help);
