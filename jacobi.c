@@ -1,39 +1,35 @@
 #include "jacobi.h"
 #include <stdlib.h>
 
-const char * p_s = "115792089237316195423570985008687907853269984665640564039457584007913111864739";
-const char * q_s = "4824670384888174809315457708695329493868526062531865828358260708486391273721";
-const char * b_s = "115792089237316195423570985008687907853269984665640564039457584007913111864737";
-
-void init_point(struct Point * P, BIGNUM * X, BIGNUM * Y, BIGNUM * T, BIGNUM * Z) {
-    BN_copy(P->x, X);
-    BN_copy(P->y, Y);
-    BN_copy(P->t, T);
-    BN_copy(P->z, Z);
+void init_point_wpar(struct Point * p) {
+    BN_dec2bn(&p->x, x_s);
+    BN_dec2bn(&p->y, y_s);
+    BN_dec2bn(&p->t, z_s);
+    BN_dec2bn(&p->z, t_s);
 }
 
-void init_curve(struct Curve * C){
-    BN_dec2bn(&C->p, p_s);
-    BN_dec2bn(&C->q, q_s);
-    BN_dec2bn(&C->b, b_s);
+void init_point(struct Point * p, char * X, char * Y, char * T, char * Z) {
+    BN_dec2bn(&p->x, X);
+    BN_dec2bn(&p->y, Y);
+    BN_dec2bn(&p->t, T);
+    BN_dec2bn(&p->z, Z);
+}
+
+void init_curve(struct Curve * c){
+    BN_dec2bn(&c->p, p_s);
+    BN_dec2bn(&c->q, q_s);
+    BN_dec2bn(&c->b, b_s);
 }
 
 struct Point add_points(struct Point p_1, struct Point p_2){
-    struct Point new_p;
-    struct Curve C;
-
-    C.q = BN_new();
-    C.p = BN_new();
-    C.b = BN_new();
-
-    new_p.t = BN_new();
-    new_p.x = BN_new();
-    new_p.y = BN_new();
-    new_p.z = BN_new();
+    struct Point new_p = {NULL, NULL, NULL, NULL};
+    struct Curve C = {NULL, NULL, NULL};
 
     init_curve(&C);
+
     BIGNUM * help = BN_new();
-    init_point(&new_p, help, help, help, help);
+    BN_dec2bn(&help, "0");
+    init_point(&new_p, "0", "0", "0", "0");
 
     BN_CTX *ctx = BN_CTX_new();
     //x3 = x1*z1*y2*t2 + y1*t1*x2*z2
@@ -75,9 +71,10 @@ struct Point add_points(struct Point p_1, struct Point p_2){
     BN_mod_mul(help, help, p_1.t, C.p, ctx);
     BN_mod_mul(help, help, p_1.t, C.p, ctx);
     BN_mod_add(new_p.z, new_p.z, help, C.p, ctx);
-    BN_CTX_free(ctx);
 
+    BN_CTX_free(ctx);
     BN_free(help);
+    free_curve(&C);
 
     return new_p;
 }
@@ -86,20 +83,15 @@ struct Point double_point(struct Point P){
     BIGNUM * yz = BN_new();
     BIGNUM * tz = BN_new();
     BIGNUM * yt = BN_new();
-    struct Point new_p;
-    struct Curve C;
-
-    C.q = BN_new();
-    C.p = BN_new();
-    C.b = BN_new();
-
-    new_p.t = BN_new();
-    new_p.x = BN_new();
-    new_p.y = BN_new();
-    new_p.z = BN_new();
+    struct Point new_p = {NULL, NULL, NULL, NULL};
+    struct Curve C = {NULL, NULL, NULL};
 
     init_curve(&C);
-    init_point(&new_p, yz, yz, yz, yz);
+
+    BIGNUM * help = BN_new();
+    BN_dec2bn(&help, "0");
+
+    init_point(&new_p, "0", "0", "0", "0");
 
     //x3 = 2*x*y*t*z
     BN_CTX *ctx = BN_CTX_new();
@@ -139,38 +131,26 @@ struct Point double_point(struct Point P){
     BN_free(yz);
     BN_free(tz);
     BN_free(yt);
-
+    BN_free(help);
     BN_CTX_free(ctx);
 
     return new_p;
 }
 
 struct Point multiple_point(struct Point P, BIGNUM * k){
-    struct Point Q, R;
-    struct Curve C;
+    struct Point Q = {NULL, NULL, NULL, NULL};
+    struct Point R = {NULL, NULL, NULL, NULL};;
+    struct Curve C = {NULL, NULL, NULL};
+
     BIGNUM * help = BN_new();
     BIGNUM * zero = BN_new();
-
-    C.b = BN_new();
-    C.p = BN_new();
-    C.q = BN_new();
-
-    Q.x = BN_new();
-    Q.y = BN_new();
-    Q.t = BN_new();
-    Q.z = BN_new();
-
-    R.x = BN_new();
-    R.y = BN_new();
-    R.t = BN_new();
-    R.z = BN_new();
 
     init_curve(&C);
 
     BN_dec2bn(&help, "1");
     BN_dec2bn(&zero, "0");
-    init_point(&Q, zero, help, help, help);
-    init_point(&R, P.x, P.y, P.t, P.z);
+    init_point(&Q, "0", "1", "1", "1");
+    init_point(&R, BN_bn2dec(P.x), BN_bn2dec(P.y), BN_bn2dec(P.t), BN_bn2dec(P.z));
     int n = BN_num_bytes(k);
     for (int i = n - 1; i >= 0; i--){
         if (BN_is_bit_set(k, i) == 0){
@@ -184,25 +164,17 @@ struct Point multiple_point(struct Point P, BIGNUM * k){
     }
 
     BN_free(help);
+    BN_free(zero);
     return Q;
 }
 
 int if_contains(struct Point P){
-    BIGNUM * left1;
-    BIGNUM * right;
-    BIGNUM * left2;
-    BIGNUM * help;
+    BIGNUM * left1 = BN_new();
+    BIGNUM * right = BN_new();
+    BIGNUM * left2 = BN_new();
+    BIGNUM * help = BN_new();
 
-    left1 = BN_new();
-    left2 = BN_new();
-    right = BN_new();
-    help = BN_new();
-
-    struct Curve C;
-
-    C.b = BN_new();
-    C.p = BN_new();
-    C.q = BN_new();
+    struct Curve C = {NULL, NULL, NULL};;
 
     init_curve(&C);
 
@@ -230,6 +202,7 @@ int if_contains(struct Point P){
         BN_free(right);
         BN_free(left2);
         BN_free(help);
+        free_curve(&C);
         return 1;
     }
     else {
@@ -239,4 +212,17 @@ int if_contains(struct Point P){
         BN_free(help);
         return 0;
     }
+}
+
+void free_curve(struct Curve * c) {
+    BN_free(c->q);
+    BN_free(c->p);
+    BN_free(c->b);
+}
+
+void free_point(struct Point * p) {
+    BN_free(p->x);
+    BN_free(p->y);
+    BN_free(p->t);
+    BN_free(p->z);
 }
