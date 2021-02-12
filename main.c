@@ -3,22 +3,8 @@
 
 int main()
 {
-    const char * x_s = "86773867670483746082709700497332781598034016226947998080571074369332058445893";
-    const char * y_s = "112365783073842736181650671369471258524588261898469739668735228897200995462257";
-    const char * t_s = "34969497036250894576602400300903320615522974325083826128152497107656115683806";
-    const char * z_s = "53269948314907700562817814682691121416875131851387647397949804668930162464909";
-
-    struct Curve C;
-    struct Point P;
-
-    P.x = BN_new();
-    P.y = BN_new();
-    P.t = BN_new();
-    P.z = BN_new();
-
-    C.q = BN_new();
-    C.p = BN_new();
-    C.b = BN_new();
+    struct Curve C = {NULL, NULL, NULL};
+    struct Point P = {NULL, NULL, NULL, NULL};
 
     init_curve(&C);
 
@@ -31,6 +17,7 @@ int main()
     init_point(&QQ, zro, one, one, one);
     */
 
+    /*
     BIGNUM * x1 = BN_new();
     BIGNUM * y1 = BN_new();
     BIGNUM * t1 = BN_new();
@@ -40,6 +27,9 @@ int main()
     BN_dec2bn(&z1, t_s);
     BN_dec2bn(&t1, z_s);
     init_point(&P, x1, y1, t1, z1);
+     */
+
+    init_point_wpar(&P);
 
     //Tест 1
     BIGNUM * k = BN_new();
@@ -54,23 +44,10 @@ int main()
         printf("нет\n");
 
     //Tест 2
-    struct Point N;
+    struct Point N = {NULL, NULL, NULL, NULL};
+    init_point(&N, "0", "1", "1", "1");
 
-    N.x = BN_new();
-    N.y = BN_new();
-    N.t = BN_new();
-    N.z = BN_new();
-
-    BN_dec2bn(&x1, "1");
-    BN_dec2bn(&y1, "0");
-    init_point(&N, y1, x1, x1, x1);
-
-    struct Point Test_2;
-
-    Test_2.x = BN_new();
-    Test_2.y = BN_new();
-    Test_2.t = BN_new();
-    Test_2.z = BN_new();
+    struct Point Test_2 = {NULL, NULL, NULL, NULL};
     Test_2 = multiple_point(P, C.q);
 
     printf("2 тест. Равны ли нейтральная точка и [q]P: ");
@@ -85,14 +62,10 @@ int main()
     BIGNUM * qq = BN_new();
     BN_dec2bn(&qq, "1");
     BN_add(qq, qq, C.q);
-    struct Point Test_3;
-
-    Test_3.x = BN_new();
-    Test_3.y = BN_new();
-    Test_3.t = BN_new();
-    Test_3.z = BN_new();
+    struct Point Test_3 = {NULL, NULL, NULL, NULL};
 
     Test_3 = multiple_point(P, qq);
+
     if (BN_cmp(P.x,Test_3.x) && BN_cmp(P.y, Test_3.y) && BN_cmp(P.t, Test_3.t) && BN_cmp(P.z, Test_3.z))
         printf("да\n");
     else
@@ -101,7 +74,9 @@ int main()
     printf("3.2 тест. Верно ли, что [q-1]P = -P: ");
     BN_dec2bn(&qq, "1");
     BN_sub(qq, C.q, qq);
+
     Test_3 = multiple_point(P, qq);
+
     BN_dec2bn(&qq, "-1");
     BN_CTX *m_ctx = BN_CTX_new();
     BN_mul(qq, qq, P.x, m_ctx);
@@ -115,17 +90,8 @@ int main()
     BIGNUM * k2 = BN_new();
     BN_rand_range(k1, n);
     BN_rand_range(k2, n);
-    struct Point Right, Left;
-
-    Right.x = BN_new();
-    Right.y = BN_new();
-    Right.t = BN_new();
-    Right.z = BN_new();
-
-    Left.x = BN_new();
-    Left.y = BN_new();
-    Left.t = BN_new();
-    Left.z = BN_new();
+    struct Point Right = {NULL, NULL, NULL, NULL};
+    struct Point Left = {NULL, NULL, NULL, NULL};
 
     Right = multiple_point(P, k2);
     Left = multiple_point(P, k1);
@@ -138,10 +104,6 @@ int main()
     else
         printf("нет\n");
 
-    BN_free(x1);
-    BN_free(y1);
-    BN_free(t1);
-    BN_free(z1);
     BN_free(k);
     BN_free(n);
     BN_free(qq);
