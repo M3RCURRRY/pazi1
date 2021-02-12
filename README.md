@@ -7,4 +7,3 @@ Lib : OpenSSL (libcrypto)
 How to install OpenSSL (Ubuntu) :\
 sudo apt-get install openssl\
 sudo apt-get install libssl\
-sudo apt-get install libssl-dev
